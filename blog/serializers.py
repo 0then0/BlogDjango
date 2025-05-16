@@ -4,6 +4,16 @@ from .models import Article
 
 
 class ArticleSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source="author.username")
+
     class Meta:
         model = Article
-        fields = "__all__"
+        fields = [
+            "id",
+            "author",
+            "title",
+            "content",
+            "published",
+            "published_date",
+            "tags",
+        ]

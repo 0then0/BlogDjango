@@ -1,10 +1,11 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from rest_framework import generics, viewsets
+from rest_framework import generics, permissions, viewsets
 
 from .forms import ArticleForm
 from .models import Article
+from .permissions import IsAuthorOrAdmin
 from .serializers import ArticleSerializer
 
 
@@ -36,6 +37,7 @@ class ArticleDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrAdmin]
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -51,6 +53,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
             qs = qs.filter(published_date__date=date)
 
         return qs
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 def article_index(request):
