@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Published Articles{% endblock title %}
+
+{% block content %}
+  <h1>Published Articles</h1>
+
+  {% if articles %}
+    <ul>
+      {% for article in articles %}
+        <li>
+          <a href="{% url 'article-view' article.pk %}">{{ article.title }}</a>
+          — <small>{{ article.published_date|date:"Y-m-d H:i" }}</small>
+
+          {% if user.is_authenticated %}
+            {% if user.is_staff or article.author == user %}
+              · <a href="{% url 'article-edit' article.pk %}">Edit</a>
+            {% endif %}
+          {% endif %}
+
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No articles have been published yet.</p>
+  {% endif %}
+
+{% endblock content %}

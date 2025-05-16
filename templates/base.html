@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>{% block title %}Blog{% endblock %}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	</head>
+	<body>
+		<nav>
+			<ul style="list-style: none; display: flex; gap: 1rem">
+				<li><a href="{% url 'article-index' %}">Home</a></li>
+				{% if user.is_authenticated %}
+				<li>Hello, {{ user.username }}!</li>
+				<li>
+					<form
+						action="{% url 'logout' %}"
+						method="post"
+					>
+						{% csrf_token %}
+						<button type="submit">Logout</button>
+					</form>
+				</li>
+				{% else %}
+				<li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+				<li><a href="{% url 'signup' %}">Sign Up</a></li>
+				{% endif %} {% if user.is_authenticated %}
+				<li><a href="{% url 'article-create' %}">New Article</a></li>
+				{% endif %}
+			</ul>
+		</nav>
+
+		<main>{% block content %}{% endblock %}</main>
+	</body>
+</html>

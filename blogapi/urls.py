@@ -19,9 +19,17 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework.authtoken import views as token_views
 
+from blog.views import signup
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # API
     path("api/", include("blog.api_urls")),
-    path("", include("blog.urls")),
     path("api-token-auth/", token_views.obtain_auth_token),
+    # Auth (login/logout)
+    path("accounts/", include("django.contrib.auth.urls")),
+    # Signup
+    path("accounts/signup/", signup, name="signup"),
+    # Frontend
+    path("", include("blog.urls")),
 ]
