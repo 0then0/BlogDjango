@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404, render
 from rest_framework import generics
 
 from .models import Article
@@ -27,3 +28,13 @@ class ArticleListCreateView(generics.ListCreateAPIView):
 class ArticleDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+
+
+def article_index(request):
+    articles = Article.objects.filter(published=True)
+    return render(request, "blog/index.html", {"articles": articles})
+
+
+def article_detail(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    return render(request, "blog/detail.html", {"article": article})
