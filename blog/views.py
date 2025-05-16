@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from rest_framework import generics
+from rest_framework import generics, viewsets
 
 from .forms import ArticleForm
 from .models import Article
@@ -31,6 +31,26 @@ class ArticleListCreateView(generics.ListCreateAPIView):
 class ArticleDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+
+
+class ArticleViewSet(viewsets.ModelViewSet):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        published = self.request.query_params.get("published")
+        tag = self.request.query_params.get("tag")
+        date = self.request.query_params.get("date")
+
+        if published is not None:
+            qs = qs.filter(published=published.lower() == "true")
+        if tag:
+            qs = qs.filter(tags__icontains=tag)
+        if date:
+            qs = qs.filter(published_date__date=date)
+
+        return qs
 
 
 def article_index(request):
