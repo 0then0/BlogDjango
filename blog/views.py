@@ -1,5 +1,5 @@
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from rest_framework import generics
 
@@ -52,3 +52,15 @@ def article_create(request):
     else:
         form = ArticleForm()
     return render(request, "blog/create.html", {"form": form})
+
+
+def article_edit(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    if request.method == "POST":
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            form.save()
+            return redirect("article-view", pk=article.pk)
+    else:
+        form = ArticleForm(instance=article)
+    return render(request, "blog/edit.html", {"form": form, "article": article})
