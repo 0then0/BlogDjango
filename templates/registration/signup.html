@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-
-{% block title %}Sign Up{% endblock title %}
-
+{% block title %}
+  Sign Up
+{% endblock title %}
 {% block content %}
   <h2>Create an Account</h2>
-
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Sign Up</button>
   </form>
-
-  <p>Already have an account? <a href="{% url 'login' %}?next={{ request.path }}">Log in here</a>.</p>
+  <p>
+    Already have an account? <a href="{% url 'login' %}?next={{ request.path }}">Log in here</a>.
+  </p>
 {% endblock content %}

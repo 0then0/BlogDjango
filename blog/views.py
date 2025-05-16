@@ -1,4 +1,7 @@
+from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import permissions, viewsets
 
@@ -19,19 +22,26 @@ def article_detail(request, pk):
     return render(request, "blog/detail.html", {"article": article})
 
 
+@login_required
 def article_create(request):
     if request.method == "POST":
         form = ArticleForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("article-index")
+            article = form.save(commit=False)
+            article.author = request.user
+            article.save()
+            return redirect("article-view", pk=article.pk)
     else:
         form = ArticleForm()
     return render(request, "blog/create.html", {"form": form})
 
 
+@login_required
 def article_edit(request, pk):
     article = get_object_or_404(Article, pk=pk)
+    if not (request.user.is_staff or article.author == request.user):
+        raise PermissionDenied
+
     if request.method == "POST":
         form = ArticleForm(request.POST, instance=article)
         if form.is_valid():
@@ -40,6 +50,20 @@ def article_edit(request, pk):
     else:
         form = ArticleForm(instance=article)
     return render(request, "blog/edit.html", {"form": form, "article": article})
+
+
+@login_required
+def article_delete(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    if not (request.user.is_staff or article.author == request.user):
+        raise PermissionDenied
+
+    if request.method == "POST":
+        article.delete()
+        messages.success(request, "Article deleted successfully.")
+        return redirect("article-index")
+
+    return render(request, "blog/delete.html", {"article": article})
 
 
 def signup(request):
@@ -80,5 +104,4 @@ class ArticleViewSet(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        # Automatically set the author to the current user
         serializer.save(author=self.request.user)
