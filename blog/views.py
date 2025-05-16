@@ -1,6 +1,9 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from rest_framework import generics
 
+from .forms import ArticleForm
 from .models import Article
 from .serializers import ArticleSerializer
 
@@ -38,3 +41,14 @@ def article_index(request):
 def article_detail(request, pk):
     article = get_object_or_404(Article, pk=pk)
     return render(request, "blog/detail.html", {"article": article})
+
+
+def article_create(request):
+    if request.method == "POST":
+        form = ArticleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("article-index"))
+    else:
+        form = ArticleForm()
+    return render(request, "blog/create.html", {"form": form})
