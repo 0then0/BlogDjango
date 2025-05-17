@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import permissions, viewsets
 
@@ -13,8 +14,22 @@ from .serializers import ArticleSerializer
 
 # Frontend views
 def article_index(request):
-    articles = Article.objects.filter(published=True)
-    return render(request, "blog/index.html", {"articles": articles})
+    q = request.GET.get("q", "").strip()
+    base_qs = Article.objects.filter(published=True)
+
+    if q:
+        base_qs = base_qs.filter(
+            Q(title__icontains=q) | Q(content__icontains=q) | Q(tags__icontains=q)
+        )
+
+    return render(
+        request,
+        "blog/index.html",
+        {
+            "articles": base_qs,
+            "q": q,
+        },
+    )
 
 
 def article_detail(request, pk):
