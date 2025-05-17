@@ -7,44 +7,70 @@
         My Blog
       {% endblock title %}
     </title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT"
+          crossorigin="anonymous">
     <style>
+    .errorlist {
+      background-color: #fdecea;
+      border: 1px solid #f44336;
+      border-radius: .25rem;
+      padding: .75rem;
+      list-style: none;
+      margin-top: .5rem;
+    }
     .errorlist li {
-      color: #b71c1c;            
-      font-weight: bold;
+      color: #b71c1c;
+      font-weight: 600;
     }
     </style>
   </head>
-  <body>
-    <nav>
-      <ul style="list-style: none; display: flex; gap: 1rem;">
-        <li>
-          <a href="{% url 'article-index' %}">Home</a>
-        </li>
-        {% if user.is_authenticated %}
-          <li>Hello, {{ user.username }}!</li>
-          <li>
-            <form action="{% url 'logout' %}" method="post" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit">Logout</button>
-            </form>
-          </li>
-          <li>
-            <a href="{% url 'article-create' %}">New Article</a>
-          </li>
-        {% else %}
-          <li>
-            <a href="{% url 'login' %}?next={{ request.path }}">Login</a>
-          </li>
-          <li>
-            <a href="{% url 'signup' %}">Sign Up</a>
-          </li>
-        {% endif %}
-      </ul>
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'article-index' %}">My Blog</a>
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav ms-auto align-items-center">
+            {% if user.is_authenticated %}
+              <li class="nav-item">
+                <span class="navbar-text text-white mb-10">Hello, {{ user.username }}</span>
+              </li>
+              <li class="nav-item ms-lg-3 mb-2 mb-lg-0">
+                <form action="{% url 'logout' %}" method="post" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-light w-100">Logout</button>
+                </form>
+              </li>
+              <li class="nav-item ms-lg-3 mb-2 mb-lg-0">
+                <a href="{% url 'article-create' %}"
+                   class="btn btn-sm btn-success w-100">New Article</a>
+              </li>
+            {% else %}
+              <li class="nav-item mb-2 mb-lg-0">
+                <a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">Login</a>
+              </li>
+              <li class="nav-item ms-lg-3 mb-2 mb-lg-0">
+                <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
     </nav>
-    <main>
+    <main class="container">
       {% block content %}
       {% endblock content %}
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+            crossorigin="anonymous"></script>
   </body>
 </html>
